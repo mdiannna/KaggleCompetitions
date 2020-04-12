@@ -4,13 +4,13 @@ import math
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error, mean_squared_log_error
 from sklearn.linear_model import LinearRegression
+from sklearn import linear_model
 
 
 TRAIN_DATA_FILE = "data/train.csv"
 TEST_DATA_FILE = "data/test.csv"
 SAMPLE_SUBMISSION_FILE = "data/sample_submission.csv"
-index = "3"
-RESULTS_FILE = "data/submissions/" + str(index) + ".csv"
+index = "5"
 
 def read_data():
 	data = pd.read_csv(TRAIN_DATA_FILE)
@@ -69,7 +69,28 @@ X_test = X_test.interpolate()
 # Train model
 #############################
 
-model = LinearRegression().fit(X_train, y_train)
+models = []
+model_names = []
+
+model = LinearRegression()
+models.append(model)
+model_names.append("LinearRegression")
+
+# models.append(linear_model.RidgeCV(alphas=np.logspace(-6, 6, 13)))
+models.append(linear_model.RidgeCV())
+model_names.append("RidgeCV")
+
+model = linear_model.Lasso()
+models.append(model)
+model_names.append("Lasso")
+
+model = linear_model.Lasso(alpha=0.1)
+models.append(model)
+model_names.append("Lasso alpha 0.1")
+
+
+
+
 
 def predictModel(X_test, model):
 	y_predicted = model.predict(X_test)
@@ -83,7 +104,6 @@ def predictModel(X_test, model):
 	print(mean_squared_error(y_test, y_predicted))
 	return y_predicted
 
-y_predicted = predictModel(X_test, model)
 
 def calcError(y_test, y_predicted):
 	print("Root Mean Squared Logarithmic Error (RMSE):")
@@ -91,11 +111,14 @@ def calcError(y_test, y_predicted):
 	print(rmse)
 	return rmse
 
-# calcError(y_test, y_predicted)
 
 
 
-def predictSubmission(model):
+def predictSubmission(model, index_name):
+	
+	# RESULTS_FILE = "data/submissions/" + str(index) + ".csv"
+	RESULTS_FILE = "data/submissions/" + str(index_name) + ".csv"
+
 	data_test = pd.read_csv(TEST_DATA_FILE)
 
 	final_data = pd.DataFrame(data_test["Id"], columns =['Id', 'SalePrice'])
@@ -112,4 +135,16 @@ def predictSubmission(model):
 
 	final_data.to_csv(RESULTS_FILE, index=False)
 
-predictSubmission(model)
+
+
+# y_predicted = predictModel(X_test, model)
+# calcError(y_test, y_predicted)
+
+i = 0
+for model in models:
+	print("MODEL" + model_names[i])
+	model.fit(X_train, y_train)
+	y_predicted = predictModel(X_test, model)
+	calcError(y_test, y_predicted)
+	predictSubmission(model, index + model_names[i])
+	i+=1

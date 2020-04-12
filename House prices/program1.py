@@ -72,12 +72,12 @@ print(y_test.size)
 import numpy as np
 from sklearn.linear_model import LinearRegression
 
-reg = LinearRegression().fit(X_train, y_train)
-reg.score(X, y)
+model = LinearRegression().fit(X_train, y_train)
+model.score(X, y)
 
-y_predicted = reg.predict(X_test)
+y_predicted = model.predict(X_test)
 
-score_test  = reg.score(X_test, y_test)
+score_test  = model.score(X_test, y_test)
 print("Score test:")
 print(score_test)
 print(y_predicted[0:10])
@@ -85,6 +85,8 @@ print(y_test[0:10])
 
 
 
+# predicted data format:
+# Id, SalePrice
 
 #  Test on test data from kaggle:
 
@@ -93,21 +95,10 @@ data_test = pd.read_csv(TEST_DATA_FILE)
 final_data = pd.DataFrame(data_test["Id"], columns =['Id', 'SalePrice'])
 # final_data["Id"] = data_test["Id"]
 
-
 data_test= data_test[["LotArea", "OverallQual", "OverallCond", "TotalBsmtSF", "GrLivArea", "Fireplaces", "GarageArea"]]
-print(data_test.head())
-# print(data_test["Id"])
 
-final_data["SalePrice"] = reg.predict(data_test)
+# TODO: remove NaNs before prediction
+final_data["SalePrice"] = model.predict(data_test)
 
 print(final_data.head())
-# print(final_data.head())
 
-# final_data = pd.dataframe["Id", "SalePrice"]
-# final_data["SalePrice"] = y_test
-# final_data["Id"] = test_Ids
-
-# df1 = pd.read_csv(SAMPLE_SUBMISSION_FILE)
-# print(df1.head())  
-# predicted data format:
-# Id, SalePrice
